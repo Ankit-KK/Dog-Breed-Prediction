@@ -1,4 +1,2 @@
 Keras
-opencv
 numpy
-streamlit
