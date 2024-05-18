@@ -33,8 +33,14 @@ if submit:
 
         # Convert image to 4 Dimension
         opencv_image = np.expand_dims(opencv_image, axis=0)
+        
+        # Print debug statements
+        st.write(f"Image shape: {opencv_image.shape}")
+        st.write(f"Image dtype: {opencv_image.dtype}")
 
         # Make Prediction
-        Y_pred = model.predict(opencv_image)
-
-        st.title(f"The Dog Breed is {CLASS_NAMES[np.argmax(Y_pred)]}")
+        try:
+            Y_pred = model.predict(opencv_image)
+            st.title(f"The Dog Breed is {CLASS_NAMES[np.argmax(Y_pred)]}")
+        except Exception as e:
+            st.error(f"Error making prediction: {e}")
