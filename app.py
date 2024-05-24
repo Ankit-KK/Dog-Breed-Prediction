@@ -3,9 +3,29 @@ import numpy as np
 import streamlit as st
 import cv2
 from keras.models import load_model
+from keras.utils import custom_object_scope
 
-# Loading the Model
-model = load_model('dog_breed.h5')
+# Define the custom layer
+class CustomScaleLayer(Layer):
+    def __init__(self, scale_factor, **kwargs):
+        super(CustomScaleLayer, self).__init__(**kwargs)
+        self.scale_factor = scale_factor
+
+    def call(self, inputs):
+        return inputs * self.scale_factor
+
+    def get_config(self):
+        config = super(CustomScaleLayer, self).get_config()
+        config.update({'scale_factor': self.scale_factor})
+        return config
+
+# Attempt to load the model
+try:
+    with custom_object_scope({'CustomScaleLayer': CustomScaleLayer}):
+        model = load_model('dog_breed.h5')
+    st.write("Model loaded successfully.")
+except Exception as e:
+    st.error(f"Error loading model: {e}")
 
 # Name of Classes
 CLASS_NAMES = ['Scottish Deerhound', 'Maltese Dog', 'Bernese Mountain Dog']
@@ -47,3 +67,5 @@ if submit:
             st.title(f"The Dog Breed is {CLASS_NAMES[np.argmax(Y_pred)]}")
         except Exception as e:
             st.error(f"Error making prediction: {e}")
+    else:
+        st.warning("Please upload an image before submitting.")
